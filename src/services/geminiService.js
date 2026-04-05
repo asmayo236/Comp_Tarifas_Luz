@@ -10,7 +10,11 @@ export async function analyzeInvoiceWithGemini(text, apiKey) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.1, maxOutputTokens: 2048 },
+      generationConfig: {
+        temperature: 0.1,
+        maxOutputTokens: 2048,
+        responseMimeType: 'application/json',
+      },
     }),
   });
 
@@ -28,7 +32,19 @@ export async function analyzeInvoiceWithGemini(text, apiKey) {
     throw new Error('No se pudo extraer JSON de la respuesta de Gemini');
   }
 
-  return JSON.parse(jsonMatch[0]);
+  // Clean common issues: trailing commas, comments, "número o null" literals
+  let cleaned = jsonMatch[0]
+    .replace(/\/\/.*$/gm, '')                    // remove line comments
+    .replace(/\/\*[\s\S]*?\*\//g, '')            // remove block comments
+    .replace(/,\s*([\]}])/g, '$1')               // remove trailing commas
+    .replace(/:\s*número\b[^,}\n]*/gi, ': null') // "número o null" → null
+    .replace(/:\s*NaN\b/g, ': null');            // NaN → null
+
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    throw new Error('No se pudo interpretar el JSON de Gemini. Respuesta:\n' + rawText.slice(0, 500));
+  }
 }
 
 export function mapGeminiToTarifa(geminiData) {
