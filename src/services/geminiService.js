@@ -24,12 +24,25 @@ export async function analyzeInvoiceWithGemini(text, apiKey) {
   }
 
   const data = await response.json();
-  const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  const parts = data.candidates?.[0]?.content?.parts || [];
+
+  // Gemini 2.5 returns multiple parts: "thought" parts + text part.
+  // Find the text part that contains JSON (skip thought parts).
+  let rawText = '';
+  for (const part of parts) {
+    if (part.text && !part.thought) {
+      rawText += part.text;
+    }
+  }
+  // Fallback: if no non-thought part found, concatenate all text parts
+  if (!rawText) {
+    rawText = parts.map(p => p.text || '').join('\n');
+  }
 
   // Extract JSON from response (may be wrapped in markdown code block)
   const jsonMatch = rawText.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
-    throw new Error('No se pudo extraer JSON de la respuesta de Gemini');
+    throw new Error('No se pudo extraer JSON de la respuesta de Gemini. Respuesta:\n' + rawText.slice(0, 300));
   }
 
   // Clean common issues: trailing commas, comments, "número o null" literals
@@ -42,7 +55,7 @@ export async function analyzeInvoiceWithGemini(text, apiKey) {
 
   try {
     return JSON.parse(cleaned);
-  } catch {
+  } catch (e) {
     throw new Error('No se pudo interpretar el JSON de Gemini. Respuesta:\n' + rawText.slice(0, 500));
   }
 }
