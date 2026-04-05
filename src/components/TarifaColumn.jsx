@@ -1,8 +1,8 @@
 import PotenciaInputs from './PotenciaInputs.jsx';
 import EnergiaInputs from './EnergiaInputs.jsx';
 import ConsumoInputs from './ConsumoInputs.jsx';
-import NumInput from './NumInput.jsx';
 import { calcularTarifa } from '../services/simulator.js';
+import { fmtEur } from '../services/format.js';
 
 export default function TarifaColumn({ tarifa, onChange, periodo, isPrincipal = false, isWinner = false, onRemove }) {
   const resultado = calcularTarifa(tarifa, periodo);
@@ -31,27 +31,14 @@ export default function TarifaColumn({ tarifa, onChange, periodo, isPrincipal = 
         )}
       </div>
 
-      <PotenciaInputs tarifa={tarifa} onChange={onChange} />
+      <PotenciaInputs tarifa={tarifa} onChange={onChange} editable={isPrincipal} />
       <EnergiaInputs tarifa={tarifa} onChange={onChange} />
       <ConsumoInputs
         tarifa={tarifa}
         onChange={onChange}
-        disabled={!isPrincipal}
+        isPrincipal={isPrincipal}
         periodoTipo={periodo.tipo}
       />
-
-      <div className="mb-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-text-secondary mb-3 border-b border-gray-100 pb-1">
-          Otros
-        </h3>
-        <NumInput
-          label="Alquiler contador"
-          value={tarifa.alquiler_contador_eur_mes}
-          onChange={(v) => onChange({ ...tarifa, alquiler_contador_eur_mes: v })}
-          suffix="€/mes"
-          step={0.01}
-        />
-      </div>
 
       {/* Results breakdown */}
       <div className="mt-auto pt-4 border-t-2 border-gray-100">
@@ -59,11 +46,17 @@ export default function TarifaColumn({ tarifa, onChange, periodo, isPrincipal = 
           <ResultRow label="Energía" value={resultado.costeEnergia} />
           <ResultRow label="Potencia" value={resultado.costePotencia} />
           <ResultRow label="Imp. eléctrico" value={resultado.impuestoElectrico} />
-          <ResultRow label="Contador" value={resultado.alquilerContador} />
+          <div className="flex justify-between text-text-secondary">
+            <span className="flex items-center gap-1">
+              Contador
+              <span className="cursor-help text-primary-light text-xs" title="Alquiler de contador: 0,81 €/mes">ℹ️</span>
+            </span>
+            <span className="font-semibold text-text-main">{fmtEur(resultado.alquilerContador)} €</span>
+          </div>
           <ResultRow label="IVA (21%)" value={resultado.iva} />
           <div className="flex justify-between pt-2 border-t border-gray-200 text-base font-extrabold">
             <span>TOTAL</span>
-            <span className="text-primary">{resultado.total.toFixed(2)} €</span>
+            <span className="text-primary">{fmtEur(resultado.total)} €</span>
           </div>
         </div>
       </div>
@@ -75,7 +68,7 @@ function ResultRow({ label, value }) {
   return (
     <div className="flex justify-between text-text-secondary">
       <span>{label}</span>
-      <span className="font-semibold text-text-main">{value.toFixed(2)} €</span>
+      <span className="font-semibold text-text-main">{fmtEur(value)} €</span>
     </div>
   );
 }

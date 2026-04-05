@@ -4,6 +4,7 @@ import {
   ReferenceLine, ResponsiveContainer, Legend, ReferenceDot
 } from 'recharts';
 import { generarDatosGrafica, calcularPuntoCruce, calcularTarifa } from '../services/simulator.js';
+import { fmtEur, fmtNum } from '../services/format.js';
 
 const COLORS = ['#2563eb', '#f59e0b', '#10b981', '#8b5cf6'];
 const NAMES_DEFAULT = ['Tu tarifa', 'Alternativa', '3ª tarifa', '4ª tarifa'];
@@ -27,11 +28,6 @@ export default function CrossoverChart({ tarifaPrincipal, tarifas, periodo }) {
     }
     return puntos;
   }, [allTarifas, periodo, conImpuestos]);
-
-  const totalPrincipal = useMemo(
-    () => calcularTarifa(tarifaPrincipal, periodo).total,
-    [tarifaPrincipal, periodo]
-  );
 
   const nombres = [
     'Tu tarifa',
@@ -63,14 +59,16 @@ export default function CrossoverChart({ tarifaPrincipal, tarifas, periodo }) {
             dataKey="consumo"
             label={{ value: 'Consumo (kWh)', position: 'insideBottom', offset: -5, style: { fontSize: 12 } }}
             tick={{ fontSize: 11 }}
+            tickFormatter={(v) => fmtNum(v)}
           />
           <YAxis
             label={{ value: 'Coste (€)', angle: -90, position: 'insideLeft', offset: 10, style: { fontSize: 12 } }}
             tick={{ fontSize: 11 }}
+            tickFormatter={(v) => fmtNum(v)}
           />
           <Tooltip
-            formatter={(value, name) => [`${value.toFixed(2)} €`, name]}
-            labelFormatter={(v) => `${v} kWh`}
+            formatter={(value, name) => [`${fmtEur(value)} €`, name]}
+            labelFormatter={(v) => `${fmtNum(v)} kWh`}
           />
           <Legend />
 
@@ -91,7 +89,7 @@ export default function CrossoverChart({ tarifaPrincipal, tarifas, periodo }) {
             x={consumoActual}
             stroke="#6b7280"
             strokeDasharray="4 4"
-            label={{ value: `Tu consumo: ${consumoActual} kWh`, position: 'top', style: { fontSize: 11, fill: '#6b7280' } }}
+            label={{ value: `Tu consumo: ${fmtNum(consumoActual)} kWh`, position: 'top', style: { fontSize: 11, fill: '#6b7280' } }}
           />
 
           {puntosCruce.map((pc, i) => (
@@ -113,10 +111,10 @@ export default function CrossoverChart({ tarifaPrincipal, tarifas, periodo }) {
           {puntosCruce.map((pc, i) => (
             <div key={i} className="bg-primary-lighter rounded-xl p-3 text-sm">
               <p className="font-bold text-primary">
-                Punto de cruce vs {nombres[pc.idx]}: {Math.round(pc.consumo).toLocaleString('es-ES')} kWh{periodo.tipo === 'anual' ? '/año' : ''}
+                Punto de cruce vs {nombres[pc.idx]}: {fmtNum(Math.round(pc.consumo))} kWh{periodo.tipo === 'anual' ? '/año' : ''}
               </p>
               <p className="text-text-secondary text-xs mt-1">
-                Con tu consumo de {consumoActual.toLocaleString('es-ES')} kWh,{' '}
+                Con tu consumo de {fmtNum(consumoActual)} kWh,{' '}
                 {consumoActual > pc.consumo
                   ? `${nombres[pc.idx]} es más económica`
                   : 'tu tarifa actual es más económica'}

@@ -24,18 +24,19 @@ export default function App() {
   const [processingMsg, setProcessingMsg] = useState('');
   const [error, setError] = useState(null);
 
-  // Sync consumo from principal to alternativas
-  const syncConsumo = useCallback((principal, alts) => {
+  // Sync consumo and potencia from principal to alternativas
+  const syncFromPrincipal = useCallback((principal, alts) => {
     return alts.map(t => ({
       ...t,
       consumo_kwh: { ...principal.consumo_kwh },
+      potencia_kw: { ...principal.potencia_kw },
     }));
   }, []);
 
   const handleChangePrincipal = useCallback((updated) => {
     setTarifaPrincipal(updated);
-    setTarifas(prev => syncConsumo(updated, prev));
-  }, [syncConsumo]);
+    setTarifas(prev => syncFromPrincipal(updated, prev));
+  }, [syncFromPrincipal]);
 
   const handleChangeTarifa = useCallback((idx, updated) => {
     setTarifas(prev => {
@@ -93,7 +94,7 @@ export default function App() {
 
       setTarifaPrincipal(nuevaTarifa);
       setPeriodo(nuevoPeriodo);
-      setTarifas(prev => syncConsumo(nuevaTarifa, prev));
+      setTarifas(prev => syncFromPrincipal(nuevaTarifa, prev));
     } catch (err) {
       console.error('Error processing invoice:', err);
       setError(err.message);

@@ -1,4 +1,5 @@
 import { calcularTarifa } from '../services/simulator.js';
+import { fmtEur } from '../services/format.js';
 
 export default function ResultsSummary({ tarifaPrincipal, tarifas, periodo }) {
   const totalPrincipal = calcularTarifa(tarifaPrincipal, periodo).total;
@@ -19,7 +20,7 @@ export default function ResultsSummary({ tarifaPrincipal, tarifas, periodo }) {
             <div key={idx}>
               <div className="flex justify-between text-sm mb-1">
                 <span className="font-medium">Tu tarifa</span>
-                <span className="font-bold">{totalPrincipal.toFixed(2)} €</span>
+                <span className="font-bold">{fmtEur(totalPrincipal)} €</span>
               </div>
               <div className="w-full bg-gray-100 rounded-full h-4 mb-2 overflow-hidden">
                 <div
@@ -29,7 +30,7 @@ export default function ResultsSummary({ tarifaPrincipal, tarifas, periodo }) {
               </div>
               <div className="flex justify-between text-sm mb-1">
                 <span className="font-medium">{tarifa.nombre}</span>
-                <span className="font-bold">{totalAlt.toFixed(2)} €</span>
+                <span className="font-bold">{fmtEur(totalAlt)} €</span>
               </div>
               <div className="w-full bg-gray-100 rounded-full h-4 mb-3 overflow-hidden">
                 <div
@@ -40,11 +41,11 @@ export default function ResultsSummary({ tarifaPrincipal, tarifas, periodo }) {
               <div className={`text-center p-3 rounded-xl ${diferencia >= 0 ? 'bg-primary-lighter' : 'bg-red-50'}`}>
                 {diferencia >= 0 ? (
                   <span className="text-primary font-bold">
-                    ✅ Ahorras {diferencia.toFixed(2)} €{periodo.tipo === 'anual' ? '/año' : ''} ({porcentaje.toFixed(1)}%)
+                    Ahorras {fmtEur(diferencia)} €{periodo.tipo === 'anual' ? '/año' : ''} ({fmtEur(porcentaje, 1)}%)
                   </span>
                 ) : (
                   <span className="text-danger font-bold">
-                    ⚠️ Pagas {Math.abs(diferencia).toFixed(2)} € más ({Math.abs(porcentaje).toFixed(1)}%)
+                    Pagas {fmtEur(Math.abs(diferencia))} € más ({fmtEur(Math.abs(porcentaje), 1)}%)
                   </span>
                 )}
               </div>

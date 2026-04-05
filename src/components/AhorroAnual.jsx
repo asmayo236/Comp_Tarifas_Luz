@@ -1,4 +1,5 @@
 import { calcularTarifa } from '../services/simulator.js';
+import { fmtNum } from '../services/format.js';
 
 export default function AhorroAnual({ tarifaPrincipal, tarifas, periodo }) {
   if (periodo.tipo === 'anual') return null;
@@ -16,7 +17,7 @@ export default function AhorroAnual({ tarifaPrincipal, tarifas, periodo }) {
             <span className="text-2xl">💡</span>
             <div>
               <p className="font-bold text-primary">
-                Ahorro anual estimado vs {tarifa.nombre}: ~{Math.abs(diferenciaAnual).toFixed(0)} €/año
+                Ahorro anual estimado vs {tarifa.nombre}: ~{fmtNum(Math.abs(diferenciaAnual))} €/año
               </p>
               <p className="text-xs text-text-secondary">
                 Basado en extrapolar el periodo de {periodo.dias} días
