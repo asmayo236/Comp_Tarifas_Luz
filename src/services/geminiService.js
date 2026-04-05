@@ -12,8 +12,8 @@ export async function analyzeInvoiceWithGemini(text, apiKey) {
       contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.1,
-        maxOutputTokens: 2048,
-        responseMimeType: 'application/json',
+        maxOutputTokens: 8192,
+        thinkingConfig: { thinkingBudget: 0 },
       },
     }),
   });
