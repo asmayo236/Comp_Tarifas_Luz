@@ -8,8 +8,6 @@ import AhorroAnual from './components/AhorroAnual.jsx';
 import ApiKeyModal from './components/ApiKeyModal.jsx';
 import UploadOverlay from './components/UploadOverlay.jsx';
 import { defaultTarifaPrincipal, defaultTarifaAlternativa, defaultPeriodo } from './data/defaults.js';
-import { extractTextFromPDF } from './services/pdfExtractor.js';
-import { analyzeInvoiceWithGemini, mapGeminiToTarifa, mapGeminiToPeriodo } from './services/geminiService.js';
 
 function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
@@ -83,9 +81,11 @@ export default function App() {
 
     try {
       setProcessingMsg('Extrayendo texto del PDF...');
+      const { extractTextFromPDF } = await import('./services/pdfExtractor.js');
       const text = await extractTextFromPDF(file);
 
       setProcessingMsg('Analizando con Gemini...');
+      const { analyzeInvoiceWithGemini, mapGeminiToTarifa, mapGeminiToPeriodo } = await import('./services/geminiService.js');
       const geminiData = await analyzeInvoiceWithGemini(text, apiKey);
 
       const nuevaTarifa = mapGeminiToTarifa(geminiData);
