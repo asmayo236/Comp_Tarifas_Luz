@@ -12,9 +12,11 @@ export default function ResultsSummary({ tarifaPrincipal, tarifas, periodo }) {
       <div className="space-y-4">
         {tarifas.map((tarifa, idx) => {
           const totalAlt = calcularTarifa(tarifa, periodo).total;
-          const diferencia = totalPrincipal - totalAlt;
-          const porcentaje = totalPrincipal > 0 ? (diferencia / totalPrincipal) * 100 : 0;
+          // positive = alt cheaper, negative = alt more expensive
+          const ahorro = totalPrincipal - totalAlt;
+          const porcentaje = totalPrincipal > 0 ? (ahorro / totalPrincipal) * 100 : 0;
           const maxTotal = Math.max(totalPrincipal, totalAlt);
+          const altGana = ahorro > 0;
 
           return (
             <div key={idx}>
@@ -24,7 +26,7 @@ export default function ResultsSummary({ tarifaPrincipal, tarifas, periodo }) {
               </div>
               <div className="w-full bg-gray-100 rounded-full h-4 mb-2 overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all ${diferencia >= 0 ? 'bg-danger' : 'bg-primary'}`}
+                  className={`h-full rounded-full transition-all ${altGana ? 'bg-danger' : 'bg-primary'}`}
                   style={{ width: `${maxTotal > 0 ? (totalPrincipal / maxTotal) * 100 : 0}%` }}
                 />
               </div>
@@ -34,18 +36,18 @@ export default function ResultsSummary({ tarifaPrincipal, tarifas, periodo }) {
               </div>
               <div className="w-full bg-gray-100 rounded-full h-4 mb-3 overflow-hidden">
                 <div
-                  className={`h-full rounded-full transition-all ${diferencia >= 0 ? 'bg-primary' : 'bg-danger'}`}
+                  className={`h-full rounded-full transition-all ${altGana ? 'bg-primary' : 'bg-danger'}`}
                   style={{ width: `${maxTotal > 0 ? (totalAlt / maxTotal) * 100 : 0}%` }}
                 />
               </div>
-              <div className={`text-center p-3 rounded-xl ${diferencia >= 0 ? 'bg-primary-lighter' : 'bg-red-50'}`}>
-                {diferencia >= 0 ? (
+              <div className={`text-center p-3 rounded-xl ${altGana ? 'bg-primary-lighter' : 'bg-red-50'}`}>
+                {altGana ? (
                   <span className="text-primary font-bold">
-                    Ahorras {fmtEur(diferencia)} €{periodo.tipo === 'anual' ? '/año' : ''} ({fmtEur(porcentaje, 1)}%)
+                    Con {tarifa.nombre} ahorras {fmtEur(ahorro)} €{periodo.tipo === 'anual' ? '/año' : ''} ({fmtEur(porcentaje, 1)}%)
                   </span>
                 ) : (
                   <span className="text-danger font-bold">
-                    Pagas {fmtEur(Math.abs(diferencia))} € más ({fmtEur(Math.abs(porcentaje), 1)}%)
+                    Tu tarifa es más económica por {fmtEur(Math.abs(ahorro))} €{periodo.tipo === 'anual' ? '/año' : ''} ({fmtEur(Math.abs(porcentaje), 1)}%)
                   </span>
                 )}
               </div>

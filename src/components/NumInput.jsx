@@ -1,13 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 
+function toDisplayString(value) {
+  return String(value).replace('.', ',');
+}
+
 export default function NumInput({ label, value, onChange, suffix = '', step = 1, disabled = false, tooltip }) {
-  const [localValue, setLocalValue] = useState(String(value));
+  const [localValue, setLocalValue] = useState(toDisplayString(value));
   const isFocused = useRef(false);
 
   // Sync from parent when not editing
   useEffect(() => {
     if (!isFocused.current) {
-      setLocalValue(String(value));
+      setLocalValue(toDisplayString(value));
     }
   }, [value]);
 
@@ -16,9 +20,9 @@ export default function NumInput({ label, value, onChange, suffix = '', step = 1
     const parsed = parseFloat(localValue.replace(',', '.'));
     if (!isNaN(parsed)) {
       onChange(parsed);
-      setLocalValue(String(parsed));
+      setLocalValue(toDisplayString(parsed));
     } else {
-      setLocalValue(String(value));
+      setLocalValue(toDisplayString(value));
     }
   };
 
