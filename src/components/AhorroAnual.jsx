@@ -9,16 +9,21 @@ export default function AhorroAnual({ tarifaPrincipal, tarifas, periodo }) {
   // Find the cheapest alternative
   let bestName = null;
   let bestAhorro = 0;
+  let bestTotalAlt = 0;
   tarifas.forEach((tarifa) => {
     const totalAlt = calcularTarifa(tarifa, periodo).total;
     const ahorro = totalPrincipal - totalAlt;
     if (ahorro > bestAhorro || bestName === null) {
       bestAhorro = ahorro;
       bestName = tarifa.nombre;
+      bestTotalAlt = totalAlt;
     }
   });
 
-  const ahorroAnual = bestAhorro * (365 / periodo.dias);
+  const factor = 365 / periodo.dias;
+  const ahorroAnual = bestAhorro * factor;
+  const totalAnualPrincipal = totalPrincipal * factor;
+  const totalAnualAlt = bestTotalAlt * factor;
 
   return (
     <div className="bg-success-light rounded-2xl p-5 mb-6">
@@ -32,7 +37,11 @@ export default function AhorroAnual({ tarifaPrincipal, tarifas, periodo }) {
             }
           </p>
           <p className="text-xs text-text-secondary">
-            Basado en extrapolar el periodo de {periodo.dias} días
+            {bestAhorro > 0
+              ? `Pasarías de ~${fmtNum(Math.round(totalAnualPrincipal))} €/año a ~${fmtNum(Math.round(totalAnualAlt))} €/año`
+              : `Pasarías de ~${fmtNum(Math.round(totalAnualPrincipal))} €/año a ~${fmtNum(Math.round(totalAnualAlt))} €/año`
+            }
+            {' · '}Basado en extrapolar el periodo de {periodo.dias} días
           </p>
         </div>
       </div>
