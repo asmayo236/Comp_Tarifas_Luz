@@ -4,9 +4,8 @@ import {
   ReferenceLine, ResponsiveContainer, Legend, ReferenceDot
 } from 'recharts';
 import { generarDatosGrafica, calcularPuntoCruce } from '../services/simulator.js';
-import { fmtEur, fmtNum } from '../services/format.js';
+import { fmtEur, fmtNum, TARIFA_COLORS } from '../services/format.js';
 
-const COLORS = ['#2563eb', '#f59e0b', '#10b981', '#8b5cf6'];
 const NAMES_DEFAULT = ['Tu tarifa', 'Alternativa', '3ª tarifa', '4ª tarifa'];
 
 export default function CrossoverChart({ tarifaPrincipal, tarifas, periodo }) {
@@ -14,14 +13,15 @@ export default function CrossoverChart({ tarifaPrincipal, tarifas, periodo }) {
 
   const allTarifas = [tarifaPrincipal, ...tarifas];
   const consumoPeriodo = tarifaPrincipal.consumo_kwh.total;
+  const dias = periodo.dias || 365;
 
   // Always show annual consumption on the chart
   const consumoAnual = periodo.tipo === 'anual'
     ? consumoPeriodo
-    : Math.round(consumoPeriodo * (365 / periodo.dias));
+    : Math.round(consumoPeriodo * (365 / dias));
 
   // Use annual period for chart calculations
-  const periodoAnual = { tipo: 'anual', dias: 365 };
+  const periodoAnual = useMemo(() => ({ tipo: 'anual', dias: 365 }), []);
 
   const data = useMemo(
     () => generarDatosGrafica(allTarifas, periodoAnual, conImpuestos, consumoAnual),
@@ -62,6 +62,8 @@ export default function CrossoverChart({ tarifaPrincipal, tarifas, periodo }) {
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
             dataKey="consumo"
+            type="number"
+            domain={[0, 'dataMax']}
             label={{ value: 'Consumo anual (kWh/año)', position: 'insideBottom', offset: -5, style: { fontSize: 12 } }}
             tick={{ fontSize: 11 }}
             tickFormatter={(v) => fmtNum(v)}
@@ -83,19 +85,26 @@ export default function CrossoverChart({ tarifaPrincipal, tarifas, periodo }) {
               type="monotone"
               dataKey={`tarifa${idx}`}
               name={nombres[idx]}
-              stroke={COLORS[idx % COLORS.length]}
+              stroke={TARIFA_COLORS[idx % TARIFA_COLORS.length]}
               strokeWidth={2}
               dot={false}
               strokeDasharray={idx === 0 ? undefined : '6 3'}
             />
           ))}
 
-          <ReferenceLine
-            x={consumoAnual}
-            stroke="#6b7280"
-            strokeDasharray="4 4"
-            label={{ value: `Tu consumo: ${fmtNum(consumoAnual)} kWh/año`, position: 'top', style: { fontSize: 11, fill: '#6b7280' } }}
-          />
+          {consumoAnual > 0 && (
+            <ReferenceLine
+              x={consumoAnual}
+              stroke="#6b7280"
+              strokeWidth={1.5}
+              strokeDasharray="4 4"
+              label={{
+                value: `Tu consumo: ${fmtNum(consumoAnual)} kWh/año${periodo.tipo !== 'anual' ? ' (estimado)' : ''}`,
+                position: 'top',
+                style: { fontSize: 11, fill: '#6b7280' },
+              }}
+            />
+          )}
 
           {puntosCruce.map((pc, i) => (
             <ReferenceDot

@@ -137,13 +137,13 @@ export default function App() {
           periodo={periodo}
         />
 
-        <CrossoverChart
+        <AhorroAnual
           tarifaPrincipal={tarifaPrincipal}
           tarifas={tarifas}
           periodo={periodo}
         />
 
-        <AhorroAnual
+        <CrossoverChart
           tarifaPrincipal={tarifaPrincipal}
           tarifas={tarifas}
           periodo={periodo}
