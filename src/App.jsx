@@ -54,8 +54,9 @@ export default function App() {
     const nueva = deepClone(defaultTarifaAlternativa);
     nueva.nombre = `Tarifa ${tarifas.length + 2}`;
     nueva.consumo_kwh = { ...tarifaPrincipal.consumo_kwh };
+    nueva.potencia_kw = { ...tarifaPrincipal.potencia_kw };
     setTarifas(prev => [...prev, nueva]);
-  }, [tarifas.length, tarifaPrincipal.consumo_kwh]);
+  }, [tarifas.length, tarifaPrincipal.consumo_kwh, tarifaPrincipal.potencia_kw]);
 
   const handleFileSelected = useCallback((file) => {
     const savedKey = localStorage.getItem('gemini_api_key');
