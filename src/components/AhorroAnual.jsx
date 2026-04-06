@@ -7,7 +7,7 @@ export default function AhorroAnual({ tarifaPrincipal, tarifas, periodo }) {
   const totalPrincipal = calcularTarifa(tarifaPrincipal, periodo).total;
 
   return (
-    <div className="bg-primary-lighter rounded-2xl p-5 mb-6">
+    <div className="bg-success-light rounded-2xl p-5 mb-6">
       {tarifas.map((tarifa, idx) => {
         const totalAlt = calcularTarifa(tarifa, periodo).total;
         const diferenciaAnual = (totalPrincipal - totalAlt) * (365 / periodo.dias);
@@ -16,7 +16,7 @@ export default function AhorroAnual({ tarifaPrincipal, tarifas, periodo }) {
           <div key={idx} className="flex items-center gap-3">
             <span className="text-2xl">💡</span>
             <div>
-              <p className="font-bold text-primary">
+              <p className="font-bold text-success">
                 Ahorro anual estimado vs {tarifa.nombre}: ~{fmtNum(Math.abs(diferenciaAnual))} €/año
               </p>
               <p className="text-xs text-text-secondary">

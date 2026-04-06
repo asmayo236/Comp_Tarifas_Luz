@@ -3,7 +3,7 @@ import { fmtEur, TARIFA_COLORS } from '../services/format.js';
 
 export default function ResultsSummary({ tarifaPrincipal, tarifas, periodo }) {
   const totalPrincipal = calcularTarifa(tarifaPrincipal, periodo).total;
-  const colorPrincipal = TARIFA_COLORS[0]; // blue
+  const colorPrincipal = TARIFA_COLORS[0];
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-5 mb-6">
@@ -53,13 +53,18 @@ export default function ResultsSummary({ tarifaPrincipal, tarifas, periodo }) {
                   }}
                 />
               </div>
-              <div className={`text-center p-3 rounded-xl ${altGana ? 'bg-primary-lighter' : 'bg-red-50'}`}>
+              <div className={`text-center p-3 rounded-xl ${altGana ? 'bg-success-light' : 'bg-success-light'}`}>
                 {altGana ? (
-                  <span className="text-primary font-bold">
-                    Con {tarifa.nombre} ahorras {fmtEur(ahorro)} €{periodo.tipo === 'anual' ? '/año' : ''} ({fmtEur(porcentaje, 1)}%)
-                  </span>
+                  <div>
+                    <span className="text-success font-bold block">
+                      Con {tarifa.nombre} ahorras {fmtEur(ahorro)} €{periodo.tipo === 'anual' ? '/año' : ''} ({fmtEur(porcentaje, 1)}%)
+                    </span>
+                    <span className="text-success text-sm mt-1 block">
+                      Valora cambiar a {tarifa.nombre}
+                    </span>
+                  </div>
                 ) : (
-                  <span className="text-danger font-bold">
+                  <span className="text-success font-bold">
                     Tu tarifa es más económica por {fmtEur(Math.abs(ahorro))} €{periodo.tipo === 'anual' ? '/año' : ''} ({fmtEur(Math.abs(porcentaje), 1)}%)
                   </span>
                 )}

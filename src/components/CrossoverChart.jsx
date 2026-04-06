@@ -42,6 +42,8 @@ export default function CrossoverChart({ tarifaPrincipal, tarifas, periodo }) {
     ...tarifas.map((t, i) => t.nombre || NAMES_DEFAULT[i + 1])
   ];
 
+  const consumoLabel = `Tu consumo: ${fmtNum(consumoAnual)} kWh/año${periodo.tipo !== 'anual' ? ' (est.)' : ''}`;
+
   return (
     <div className="bg-white rounded-2xl shadow-sm p-5 mb-6">
       <div className="flex items-center justify-end mb-4">
@@ -58,7 +60,7 @@ export default function CrossoverChart({ tarifaPrincipal, tarifas, periodo }) {
       </div>
 
       <ResponsiveContainer width="100%" height={350}>
-        <LineChart data={data} margin={{ top: 10, right: 30, left: 10, bottom: 10 }}>
+        <LineChart data={data} margin={{ top: 25, right: 30, left: 10, bottom: 10 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
             dataKey="consumo"
@@ -88,7 +90,6 @@ export default function CrossoverChart({ tarifaPrincipal, tarifas, periodo }) {
               stroke={TARIFA_COLORS[idx % TARIFA_COLORS.length]}
               strokeWidth={2}
               dot={false}
-              strokeDasharray={idx === 0 ? undefined : '6 3'}
             />
           ))}
 
@@ -99,9 +100,10 @@ export default function CrossoverChart({ tarifaPrincipal, tarifas, periodo }) {
               strokeWidth={1.5}
               strokeDasharray="4 4"
               label={{
-                value: `Tu consumo: ${fmtNum(consumoAnual)} kWh/año${periodo.tipo !== 'anual' ? ' (estimado)' : ''}`,
-                position: 'top',
-                style: { fontSize: 11, fill: '#6b7280' },
+                value: consumoLabel,
+                position: 'insideTopRight',
+                style: { fontSize: 10, fill: '#6b7280' },
+                offset: 10,
               }}
             />
           )}
