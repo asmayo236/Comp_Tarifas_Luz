@@ -65,6 +65,19 @@ export function mapGeminiToTarifa(geminiData) {
   const precios = geminiData.precios_energia_eur_kwh || {};
   const tienePeriodos = precios.punta != null && precios.llano != null && precios.valle != null;
 
+  // Determine flat energy price: use precio_medio, or single-period price, or any available price
+  let precioFijo = precios.precio_medio;
+  if (precioFijo == null) {
+    precioFijo = precios.punta || precios.llano || precios.valle || 0.15;
+  }
+
+  // Determine total consumption: use total, or sum of periods, or single period value
+  let totalConsumo = consumo.total;
+  if (totalConsumo == null) {
+    totalConsumo = (consumo.punta || 0) + (consumo.llano || 0) + (consumo.valle || 0);
+  }
+  if (!totalConsumo) totalConsumo = 300;
+
   return {
     nombre: 'Mi factura',
     comercializadora: geminiData.comercializadora || 'Desconocida',
@@ -78,12 +91,12 @@ export function mapGeminiToTarifa(geminiData) {
     },
     unidad_potencia: 'anio',
     modo_energia: tienePeriodos ? '3periodos' : 'fijo24h',
-    precio_energia_fijo: precios.precio_medio || 0.15,
+    precio_energia_fijo: precioFijo,
     precios_energia: tienePeriodos
       ? { punta: precios.punta, llano: precios.llano, valle: precios.valle }
       : { punta: 0.185, llano: 0.150, valle: 0.105 },
     consumo_kwh: {
-      total: consumo.total || 300,
+      total: totalConsumo,
       punta: consumo.punta || 0,
       llano: consumo.llano || 0,
       valle: consumo.valle || 0,

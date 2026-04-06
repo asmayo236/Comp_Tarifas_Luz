@@ -60,7 +60,7 @@ export default function ResultsSummary({ tarifaPrincipal, tarifas, periodo }) {
                       Con {tarifa.nombre} ahorras {fmtEur(ahorro)} €{periodo.tipo === 'anual' ? '/año' : ''} ({fmtEur(porcentaje, 1)}%)
                     </span>
                     <span className="text-success text-sm mt-1 block">
-                      Valora cambiar a {tarifa.nombre}
+                      👉 Valora cambiar a {tarifa.nombre}
                     </span>
                   </div>
                 ) : (
